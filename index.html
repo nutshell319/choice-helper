@@ -611,19 +611,24 @@ function renderCard() {
   }
 
   const cols = n <= 4 ? n : n <= 6 ? 3 : 4;
-  const cardW = n <= 4 ? 120 : n <= 6 ? 100 : 80;
-  const cardH = n <= 4 ? 160 : n <= 6 ? 130 : 110;
-  const fontSize = n <= 4 ? 14 : 12;
+  // 响应式：fr 均分可用宽度，max-width 限制桌面端不无限拉大
+  const maxGridW = cols === 2 ? 280 : cols === 3 ? 420 : 520;
+  const gap = 'clamp(6px, 1.5vw, 12px)';
+  const fontSize = `clamp(10px, 2.2vw, ${n <= 4 ? 15 : 13}px)`;
+  const backFontSize = `clamp(20px, 5vw, 30px)`;
+  const padding = 'clamp(8px, 1.5vw, 16px)';
+  const borderRadius = 'clamp(6px, 1vw, 10px)';
 
   dom.stage.innerHTML = `
     <div id="cardGrid" style="
-      display:grid;grid-template-columns:repeat(${cols},${cardW}px);
-      gap:12px;justify-content:center;padding:16px;
+      display:grid;grid-template-columns:repeat(${cols},1fr);
+      gap:${gap};justify-content:center;padding:${padding};
+      max-width:${maxGridW}px;width:100%;margin:0 auto;
     ">
       ${state.options.map((opt, i) => `
-        <div class="card-wrapper" data-index="${i}">
+        <div class="card-wrapper" data-index="${i}" style="width:100%;">
           <div class="card-inner" style="
-            width:${cardW}px;height:${cardH}px;
+            width:100%;aspect-ratio:3/4;
             position:relative;
             transform-style:preserve-3d;
             transition:transform 0.6s;
@@ -631,17 +636,18 @@ function renderCard() {
             <div class="card-front" style="
               position:absolute;inset:0;backface-visibility:hidden;
               background:linear-gradient(135deg,var(--primary),#d4b5ff);
-              border-radius:10px;display:flex;align-items:center;justify-content:center;
-              font-size:${fontSize}px;font-weight:bold;color:#1a1a1c;
-              text-align:center;padding:6px;overflow:hidden;
+              border-radius:${borderRadius};display:flex;align-items:center;justify-content:center;
+              font-size:${fontSize};font-weight:bold;color:#1a1a1c;
+              text-align:center;padding:clamp(3px,0.8vw,6px);overflow:hidden;
+              word-break:break-all;
             ">${escapeHtml(opt)}</div>
             <div class="card-back" style="
               position:absolute;inset:0;backface-visibility:hidden;
               transform:rotateY(180deg);
               background:linear-gradient(135deg,#1a1a2e,#12121a);
-              border-radius:10px;display:flex;align-items:center;justify-content:center;
+              border-radius:${borderRadius};display:flex;align-items:center;justify-content:center;
               border:2px solid rgba(185,142,255,0.4);
-              font-size:28px;
+              font-size:${backFontSize};
             ">?</div>
           </div>
         </div>
