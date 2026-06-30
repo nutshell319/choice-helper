@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/GitHub_Pages-✓-blue?style=for-the-badge&logo=github" alt="GitHub Pages">
 </p>
 
-<h1 align="center">🎲 选择助手</h1>
+<h1 align="center">🎲 两碗饭-选择助手</h1>
 
 <p align="center">
   <strong>帮选择困难症做决定的趣味小工具</strong><br>
@@ -29,7 +29,7 @@
 
 有时候选择比努力更难。中午吃什么？周末去哪？要不要换工作？
 
-选择助手用**趣味交互**消解决策摩擦——转盘的刺激、抽签的仪式感、翻牌的悬念，让每一次选择都变成一件好玩的事。
+两碗饭-选择助手用**趣味交互**消解决策摩擦——转盘的刺激、抽签的仪式感、翻牌的悬念，让每一次选择都变成一件好玩的事。
 
 ---
 
