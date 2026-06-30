@@ -804,8 +804,6 @@ function showCardResult(index) {
 }
 
 // ===== 3D Dice Cube Engine =====
-const diceState = { min: 1, max: 6 };
-
 // 每个面的圆点位置（3x3网格，位置编号1-9）
 const FACE_DOTS = {
   1: [5],
@@ -839,20 +837,8 @@ function faceDotsHTML(n) {
 }
 
 function renderDice() {
-  const rangeOk = (diceState.max - diceState.min + 1) <= 6;
   dom.stage.innerHTML = `
     <div style="text-align:center;">
-      <div style="display:flex;gap:16px;justify-content:center;align-items:center;margin-bottom:20px;">
-        <input type="number" id="diceMin" value="${diceState.min}" min="1" max="9999"
-          style="width:80px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);
-          background:rgba(0,0,0,0.25);color:var(--text);font-size:18px;text-align:center;
-          font-family:var(--font);outline:none;">
-        <span style="font-size:20px;color:var(--text-dim);">~</span>
-        <input type="number" id="diceMax" value="${diceState.max}" min="2" max="9999"
-          style="width:80px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);
-          background:rgba(0,0,0,0.25);color:var(--text);font-size:18px;text-align:center;
-          font-family:var(--font);outline:none;">
-      </div>
       <div id="diceScene" style="perspective:500px;width:160px;height:160px;margin:0 auto 20px;pointer-events:none;">
         <div id="diceCube" style="
           width:100px;height:100px;margin:30px auto;
@@ -891,23 +877,6 @@ function renderDice() {
     </div>
   `;
 
-  document.getElementById('diceMin').addEventListener('change', (e) => {
-    diceState.min = Math.max(1, parseInt(e.target.value) || 1);
-    e.target.value = diceState.min;
-    if (diceState.min >= diceState.max) {
-      diceState.max = diceState.min + 1;
-      document.getElementById('diceMax').value = diceState.max;
-    }
-  });
-  document.getElementById('diceMax').addEventListener('change', (e) => {
-    diceState.max = Math.max(2, parseInt(e.target.value) || 2);
-    e.target.value = diceState.max;
-    if (diceState.max <= diceState.min) {
-      diceState.min = diceState.max - 1;
-      document.getElementById('diceMin').value = diceState.min;
-    }
-  });
-
   document.getElementById('btnRoll').addEventListener('click', rollDice);
   document.getElementById('btnDiceAgain').addEventListener('click', () => {
     document.getElementById('diceResult').classList.remove('show');
@@ -923,12 +892,9 @@ function rollDice() {
   btn.disabled = true;
   btn.textContent = '滚动中…';
   const cube = document.getElementById('diceCube');
-  const min = diceState.min, max = diceState.max;
-  const result = Math.floor(Math.random() * (max - min + 1)) + min;
-  const faceNum = result <= 6 ? result : (result % 6 === 0 ? 6 : result % 6);
-  const rangeOk = (max - min + 1) <= 6;
+  const result = Math.floor(Math.random() * 6) + 1;
 
-  const target = FACE_ROTATION[faceNum];
+  const target = FACE_ROTATION[result];
   // 加上多圈旋转增加视觉效果
   // 左右+上下同时旋转，模拟真实骰子弹跳
   const spinsX = (3 + Math.floor(Math.random() * 3)) * 360;
