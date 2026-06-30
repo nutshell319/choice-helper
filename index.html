@@ -960,29 +960,17 @@ function renderCoin() {
             display:flex;align-items:center;justify-content:center;
             overflow:hidden;
           ">
-            <div class="coin-flower" style="
-              position:relative;width:70px;height:70px;
-            ">
-              <div style="
-                position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-                width:16px;height:16px;border-radius:50%;
-                background:radial-gradient(circle,#f0f0f0,#b0b0b0);
-                box-shadow:0 0 6px rgba(0,0,0,0.4);
-                z-index:6;
-              "></div>
-              ${[0,60,120,180,240,300].map(deg => `
-                <div style="
-                  position:absolute;top:50%;left:50%;
-                  width:22px;height:34px;
-                  margin-left:-11px;margin-top:-28px;
-                  background:radial-gradient(ellipse at center,#f5f5f5 0%,#c0c0c0 60%,#909090 100%);
-                  border-radius:50%;
-                  box-shadow:0 0 4px rgba(0,0,0,0.3);
-                  transform-origin:center 34px;
-                  transform:rotate(${deg}deg);
-                "></div>
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <!-- 6片花瓣 -->
+              ${[0,60,120,180,240,300].map((deg, i) => `
+                <ellipse cx="40" cy="18" rx="9" ry="18"
+                  fill="#505060" stroke="#3a3a48" stroke-width="0.5"
+                  transform="rotate(${deg} 40 40)" />
               `).join('')}
-            </div>
+              <!-- 花蕊 -->
+              <circle cx="40" cy="40" r="9" fill="#404050" stroke="#303040" stroke-width="0.5"/>
+              <circle cx="40" cy="40" r="4" fill="#303040"/>
+            </svg>
           </div>
           <!-- 反面：人像剪影 -->
           <div class="coin-face coin-back" style="
@@ -998,34 +986,18 @@ function renderCoin() {
             display:flex;align-items:center;justify-content:center;
             overflow:hidden;
           ">
-            <div class="coin-portrait" style="
-              position:relative;width:50px;height:70px;
-              display:flex;flex-direction:column;align-items:center;
-            ">
+            <svg width="70" height="80" viewBox="0 0 70 80">
               <!-- 头部 -->
-              <div style="
-                width:26px;height:30px;border-radius:50% 50% 45% 45%;
-                background:linear-gradient(180deg,#b0b0b0,#808080);
-                box-shadow:0 2px 3px rgba(0,0,0,0.4);
-                position:relative;
-              ">
-                <!-- 帽饰 -->
-                <div style="
-                  position:absolute;top:-6px;left:50%;transform:translateX(-50%);
-                  width:18px;height:6px;border-radius:3px 3px 0 0;
-                  background:linear-gradient(180deg,#d0d0d0,#999);
-                "></div>
-              </div>
+              <ellipse cx="35" cy="22" rx="15" ry="18" fill="#505060"/>
+              <!-- 帽饰顶 -->
+              <rect x="25" y="3" width="20" height="7" rx="3" fill="#404050"/>
               <!-- 颈部 -->
-              <div style="width:8px;height:6px;background:#808080;border-radius:0 0 2px 2px;"></div>
-              <!-- 肩部/身体 -->
-              <div style="
-                width:50px;height:28px;
-                background:linear-gradient(180deg,#999 0%,#808080 50%,#606060 100%);
-                border-radius:50% 50% 15% 15%;
-                box-shadow:0 2px 3px rgba(0,0,0,0.4);
-              "></div>
-            </div>
+              <rect x="30" y="37" width="10" height="6" rx="2" fill="#454555"/>
+              <!-- 肩部 -->
+              <ellipse cx="35" cy="52" rx="32" ry="22" fill="#505060"/>
+              <!-- 衣领 -->
+              <path d="M25 40 L35 50 L45 40" fill="none" stroke="#404050" stroke-width="2"/>
+            </svg>
           </div>
         </div>
       </div>
