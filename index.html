@@ -793,25 +793,24 @@ function shuffleAndReveal() {
 
           // ── 诊断：显示系统检测到的卡片（用户确认后再移除） ──
           const diagLabel = document.createElement('div');
-          diagLabel.textContent = '← 系统检测到这张牌';
-          diagLabel.style.cssText = 'position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:11px;color:#ff0;white-space:nowrap;z-index:99;pointer-events:none;background:rgba(0,0,0,0.7);padding:2px 8px;border-radius:4px;';
+          // 读取卡片正面实际DOM文字（而非state.options数组）
+          const frontEl = wrapper.querySelector('.card-front');
+          const domText = frontEl ? frontEl.textContent.trim() : '(无)';
+          const arrText = state.options[chosenIndex] || '(无)';
+          const match = domText === arrText;
+          diagLabel.innerHTML = `idx=${chosenIndex} DOM="${domText}" Arr="${arrText}" ${match ? '✅' : '❌不匹配!'}`;
+          diagLabel.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;color:#ff0;white-space:nowrap;z-index:99;pointer-events:none;background:rgba(0,0,0,0.85);padding:4px 10px;border-radius:4px;max-width:95vw;overflow:hidden;text-overflow:ellipsis;';
           wrapper.style.position = 'relative';
           wrapper.appendChild(diagLabel);
           wrapper.style.outline = '2px solid #ff0';
           wrapper.style.outlineOffset = '2px';
           wrapper.style.zIndex = '50';
-          showToast(`点击检测: [${chosenIndex}] ${state.options[chosenIndex]}`, 1200);
-          // 200ms后移除诊断标记，继续翻牌
-          setTimeout(() => {
-            if (diagLabel.parentNode) diagLabel.remove();
-            wrapper.style.outline = '';
-            wrapper.style.outlineOffset = '';
-            wrapper.style.zIndex = '';
-            allWrappers.forEach(w => { w.style.cursor = 'default'; });
-            btn.disabled = true;
-            btn.textContent = '已揭晓';
-            revealCard(wrapper, chosenIndex, cardResult);
-          }, 200);
+          showToast(`idx=${chosenIndex} DOM="${domText}" ${match ? '✅一致' : '❌不匹配 Arr="'+arrText+'"'}`, 2000);
+          // 不自动翻牌，等用户观察诊断信息后再手动点击 "再来一次" 重置
+          allWrappers.forEach(w => { w.style.cursor = 'default'; });
+          btn.disabled = true;
+          btn.textContent = '诊断模式（点再来一次重置）';
+          // 不调用 revealCard —— 纯诊断
           // ── 诊断结束 ──
         });
         return;
