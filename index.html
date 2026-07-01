@@ -1106,16 +1106,15 @@ function addOption(text) {
   if (state.isAnimating) { showToast('动画进行中，请稍候'); return; }
   const trimmed = text.trim();
   if (!trimmed) { showToast('选项不能为空'); return; }
-  if (trimmed.length > 50) {
-    showToast('选项最多 50 个字符');
-    return;
-  }
+  if (trimmed.length > 50) { showToast('选项最多 50 个字符'); return; }
   if (state.options.includes(trimmed)) {
     if (!confirm(`选项"${trimmed}"已存在，确定要添加重复项吗？`)) return;
   }
   state.options.push(trimmed);
-  syncUI();
-  requestAnimationFrame(() => renderStage());
+  // 拆开 syncUI 每一步，确保即时渲染
+  try { localStorage.setItem('choice-helper-current', JSON.stringify(state.options)); } catch (e) {}
+  renderTags();
+  renderStage();
   dom.optionInput.value = '';
   dom.optionInput.focus();
 }
@@ -1124,7 +1123,9 @@ function removeOption(index) {
   if (state.isAnimating) { showToast('动画进行中，请稍候'); return; }
   if (index < 0 || index >= state.options.length) return;
   state.options.splice(index, 1);
-  syncUI();
+  try { localStorage.setItem('choice-helper-current', JSON.stringify(state.options)); } catch (e) {}
+  renderTags();
+  renderStage();
 }
 
 // ===== Event: 添加选项 =====
@@ -1150,7 +1151,9 @@ dom.btnClearOptions.addEventListener('click', () => {
   if (state.options.length === 0) return;
   if (!confirm(`确定清空全部 ${state.options.length} 个选项吗？`)) return;
   state.options = [];
-  syncUI();
+  try { localStorage.setItem('choice-helper-current', JSON.stringify(state.options)); } catch (e) {}
+  renderTags();
+  renderStage();
 });
 
 // ===== Toast =====
@@ -1299,7 +1302,9 @@ function loadPreset(name) {
   const list = presets[name];
   if (!list) { showToast('预设不存在'); return; }
   state.options = [...list];
-  syncUI();
+  try { localStorage.setItem('choice-helper-current', JSON.stringify(state.options)); } catch (e) {}
+  renderTags();
+  renderStage();
   closeModal();
   showToast(`已加载预设"${name}"（${list.length} 项）`);
 }
