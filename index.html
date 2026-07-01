@@ -807,35 +807,19 @@ function shuffleAndReveal() {
 function revealCard(wrapper, chosenIndex, allWrappers) {
   const inner = wrapper.querySelector('.card-inner');
 
-  // ── 阶段1：绿色标记点击牌 0.4s ──
-  wrapper.style.outline = '3px solid #69db7c';
-  wrapper.style.outlineOffset = '3px';
-  wrapper.style.zIndex = '50';
-  showToast(`🟢 你选择了: ${state.options[chosenIndex]}`, 1500);
+  // 点击牌先翻
+  inner.style.transform = 'rotateY(0deg)';
 
+  // 其余牌稍后翻，点击牌高亮
   setTimeout(() => {
-    // ── 阶段2：点击牌翻转 ──
-    wrapper.style.outline = '';
-    wrapper.style.outlineOffset = '';
-    wrapper.style.zIndex = '';
-    inner.style.transform = 'rotateY(0deg)';
-    showToast(`🔄 揭晓中…`, 800);
+    Array.from(allWrappers).forEach(w => {
+      w.querySelector('.card-inner').style.transform = 'rotateY(0deg)';
+    });
+    inner.style.transform = 'rotateY(0deg) scale(1.08)';
+    inner.style.boxShadow = '0 0 28px rgba(185,142,255,0.7)';
+    inner.style.zIndex = '5';
 
-    // ── 阶段3：全部翻开，点击牌高亮 ──
-    setTimeout(() => {
-      const wrappersArr = Array.from(allWrappers);
-      wrappersArr.forEach(w => {
-        w.querySelector('.card-inner').style.transform = 'rotateY(0deg)';
-      });
-
-      // 点击牌即中选牌，放大+发光
-      inner.style.transform = 'rotateY(0deg) scale(1.08)';
-      inner.style.boxShadow = '0 0 28px rgba(185,142,255,0.7)';
-      inner.style.zIndex = '5';
-      showToast(`🎉 结果: ${state.options[chosenIndex]}`, 2000);
-
-      setTimeout(() => showCardResult(chosenIndex), 800);
-    }, 450);
+    setTimeout(() => showCardResult(chosenIndex), 700);
   }, 400);
 }
 
