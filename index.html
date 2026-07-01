@@ -389,12 +389,6 @@ function renderWheel() {
 
   wheelCanvas = document.getElementById('wheelCanvas');
   wheelCtx = wheelCanvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
-  wheelCanvas.width = 320 * dpr;
-  wheelCanvas.height = 320 * dpr;
-  wheelCanvas.style.width = '320px';
-  wheelCanvas.style.height = '320px';
-  wheelCtx.scale(dpr, dpr);
   drawWheel();
 
   document.getElementById('btnSpin').addEventListener('click', spinWheel);
