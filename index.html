@@ -806,30 +806,52 @@ function shuffleAndReveal() {
 }
 
 function revealCard(wrapper, chosenIndex, winIndex) {
-  // 先翻转用户点击的那张牌
   const inner = wrapper.querySelector('.card-inner');
-  inner.style.transform = 'rotateY(0deg)';
 
-  // 短暂延迟后翻转全部牌面 + 高亮中选牌
+  // ── 阶段1：绿色标记点击牌 0.4s ──
+  wrapper.style.outline = '3px solid #69db7c';
+  wrapper.style.outlineOffset = '3px';
+  wrapper.style.zIndex = '50';
+  showToast(`🟢 你点击了: [${chosenIndex}] ${state.options[chosenIndex]}`, 1500);
+
   setTimeout(() => {
-    document.querySelectorAll('.card-inner').forEach(c => {
-      c.style.transform = 'rotateY(0deg)';
-    });
+    // ── 阶段2：点击牌单独翻转 ──
+    wrapper.style.outline = '';
+    wrapper.style.outlineOffset = '';
+    wrapper.style.zIndex = '';
+    inner.style.transform = 'rotateY(0deg)';
+    showToast(`🔄 正在翻开你点击的牌…`, 1000);
 
-    // 高亮中选牌
-    const winWrapper = document.querySelector(`.card-wrapper[data-index="${winIndex}"]`);
-    if (winWrapper) {
-      const winInner = winWrapper.querySelector('.card-inner');
-      winInner.style.transform = 'rotateY(0deg) scale(1.08)';
-      winInner.style.boxShadow = '0 0 28px rgba(185,142,255,0.7)';
-      winInner.style.zIndex = '5';
-    }
-    // 若用户点击的牌非中选牌，给点击牌加红晕提示
-    if (chosenIndex !== winIndex) {
-      inner.style.boxShadow = '0 0 8px rgba(232,93,117,0.4)';
-    }
+    // ── 阶段3：0.45s后全部牌翻转 + 紫色标记中选牌 ──
+    setTimeout(() => {
+      document.querySelectorAll('.card-inner').forEach(c => {
+        c.style.transform = 'rotateY(0deg)';
+      });
 
-    setTimeout(() => showCardResult(winIndex), 800);
+      const winWrapper = document.querySelector(`.card-wrapper[data-index="${winIndex}"]`);
+      if (winWrapper) {
+        winWrapper.style.outline = '3px solid #b98eff';
+        winWrapper.style.outlineOffset = '3px';
+        winWrapper.style.zIndex = '50';
+        const winInner = winWrapper.querySelector('.card-inner');
+        winInner.style.transform = 'rotateY(0deg) scale(1.08)';
+        winInner.style.boxShadow = '0 0 28px rgba(185,142,255,0.7)';
+        winInner.style.zIndex = '5';
+        showToast(`🟣 中选: [${winIndex}] ${state.options[winIndex]}`, 1800);
+        // 清除紫色框
+        setTimeout(() => {
+          winWrapper.style.outline = '';
+          winWrapper.style.outlineOffset = '';
+          winWrapper.style.zIndex = '';
+        }, 1000);
+      }
+
+      if (chosenIndex !== winIndex) {
+        inner.style.boxShadow = '0 0 8px rgba(232,93,117,0.4)';
+      }
+
+      setTimeout(() => showCardResult(winIndex), 800);
+    }, 450);
   }, 400);
 }
 
