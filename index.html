@@ -785,17 +785,34 @@ function shuffleAndReveal() {
         let revealed = false;
         finalGrid.addEventListener('click', function revealHandler(e) {
           if (revealed) return;
-          // 动态查找点击目标——避免移动端3D变换干扰事件路由
           const wrapper = e.target.closest('.card-wrapper');
           if (!wrapper) return;
           revealed = true;
 
           const chosenIndex = parseInt(wrapper.dataset.index);
-          allWrappers.forEach(w => { w.style.cursor = 'default'; });
-          btn.disabled = true;
-          btn.textContent = '已揭晓';
 
-          revealCard(wrapper, chosenIndex, cardResult);
+          // ── 诊断：显示系统检测到的卡片（用户确认后再移除） ──
+          const diagLabel = document.createElement('div');
+          diagLabel.textContent = '← 系统检测到这张牌';
+          diagLabel.style.cssText = 'position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:11px;color:#ff0;white-space:nowrap;z-index:99;pointer-events:none;background:rgba(0,0,0,0.7);padding:2px 8px;border-radius:4px;';
+          wrapper.style.position = 'relative';
+          wrapper.appendChild(diagLabel);
+          wrapper.style.outline = '2px solid #ff0';
+          wrapper.style.outlineOffset = '2px';
+          wrapper.style.zIndex = '50';
+          showToast(`点击检测: [${chosenIndex}] ${state.options[chosenIndex]}`, 1200);
+          // 200ms后移除诊断标记，继续翻牌
+          setTimeout(() => {
+            if (diagLabel.parentNode) diagLabel.remove();
+            wrapper.style.outline = '';
+            wrapper.style.outlineOffset = '';
+            wrapper.style.zIndex = '';
+            allWrappers.forEach(w => { w.style.cursor = 'default'; });
+            btn.disabled = true;
+            btn.textContent = '已揭晓';
+            revealCard(wrapper, chosenIndex, cardResult);
+          }, 200);
+          // ── 诊断结束 ──
         });
         return;
       }
