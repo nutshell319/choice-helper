@@ -54,18 +54,22 @@ body {
   transition: background 0.2s;
 }
 .header .btn-manage:hover { background: var(--surface-hover); }
-  .header-actions {
-    display: flex; align-items: center; gap: 8px;
-  }
-  .btn-refresh {
-    background: var(--surface); color: var(--text-dim);
-    border: 1px solid rgba(255,255,255,0.12);
-    padding: 6px 10px; border-radius: 8px; cursor: pointer;
-    font-size: 14px; font-family: var(--font); transition: all 0.2s;
-    line-height: 1;
-  }
-  .btn-refresh:hover { background: var(--surface-hover); color: var(--text); }
-  .btn-refresh:active { transform: scale(0.95); }
+	.header-actions {
+	  display: flex; align-items: center; gap: 8px;
+	}
+	.btn-refresh {
+	  background: var(--surface); color: var(--text-dim);
+	  border: 1px solid rgba(255,255,255,0.12);
+	  padding: 6px 10px; border-radius: 8px; cursor: pointer;
+	  font-size: 14px; font-family: var(--font); transition: all 0.2s;
+	  line-height: 1;
+	}
+	.btn-refresh:hover { background: var(--surface-hover); color: var(--text); }
+	.btn-refresh:active { transform: scale(0.95); }
+	.version-label {
+	  font-size: 10px; color: var(--text-dim); font-family: monospace;
+	  max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+	}
 
 /* ===== Tabs ===== */
 .tabs {
@@ -258,11 +262,12 @@ body {
 <div class="app">
   <!-- Header -->
   <div class="header">
-    <h1>🎲 两碗饭-选择助手 v2</h1>
+    <h1>🎲 两碗饭-选择助手 v3</h1>
     <div class="header-actions">
       <button class="btn-refresh" id="btnRefresh" title="清除缓存并强制刷新到最新版本">🔄</button>
+      <span id="versionLabel" class="version-label" title="当前版本哈希"></span>
       <button class="btn-manage" id="btnManage">⚙ 管理列表</button>
-  </div>
+    </div>
   </div>
 
   <!-- Tabs -->
@@ -322,7 +327,9 @@ const dom = {
   tags: $('#tags'),
   btnManage: $('#btnManage'),
   btnRefresh: $('#btnRefresh'),
+  versionLabel: $('#versionLabel'),
   btnLoadPreset: $('#btnLoadPreset'),
+  btnClearOptions: $('#btnClearOptions'),
   modalOverlay: $('#modalOverlay'),
   modalContent: $('#modalContent'),
   toast: $('#toast'),
@@ -1360,13 +1367,31 @@ dom.btnManage.addEventListener('click', openPresetManager);
 // Bind "load preset" quick button
 dom.btnLoadPreset.addEventListener('click', openPresetManager);
 
-// ===== 缓存刷新 =====
+// ===== 版本与缓存刷新 =====
+const APP_VERSION = 'd92c293';
+try {
+  // 检查是否为旧版本（通过比对 URL 中的版本标记）
+  const urlParams = new URLSearchParams(location.search);
+  const loadedVer = urlParams.get('v');
+  if (loadedVer && loadedVer !== APP_VERSION) {
+    // 刚从缓存中加载了旧版本但带时间戳参数，说明需要刷新
+    // 这种情况通常由 btnRefresh 触发，无需额外处理
+  }
+  // 每次加载显示当前版本哈希
+  if (dom.versionLabel) {
+    dom.versionLabel.textContent = APP_VERSION.slice(0, 7);
+  }
+} catch (e) { /* ignore */ }
+
+// 刷新按钮：清除浏览器缓存并强制重新加载
 dom.btnRefresh.addEventListener('click', () => {
+  // 清除 Cache API
   if ('caches' in window) {
     caches.keys().then(keys => {
       keys.forEach(key => caches.delete(key));
     }).catch(() => {});
   }
+  // 带时间戳参数强制绕过 HTTP 缓存重新加载
   location.replace(location.origin + location.pathname + '?v=' + Date.now());
 });
 
