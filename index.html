@@ -263,6 +263,7 @@ body {
       <button class="btn-refresh" id="btnRefresh" title="清除缓存并强制刷新到最新版本">🔄</button>
       <button class="btn-manage" id="btnManage">⚙ 管理列表</button>
   </div>
+  </div>
 
   <!-- Tabs -->
   <div class="tabs" id="tabs">
@@ -1096,9 +1097,9 @@ function escapeHtml(str) {
 }
 
 function syncUI() {
-  try { saveCurrent(); } catch(e) { showToast('saveCurrent: '+e.message, 3000); }
-  try { renderTags(); } catch(e) { showToast('renderTags: '+e.message, 3000); }
-  try { renderStage(); } catch(e) { showToast('renderStage: '+e.message, 3000); }
+  saveCurrent();
+  renderTags();
+  renderStage();
 }
 
 function addOption(text) {
@@ -1113,7 +1114,6 @@ function addOption(text) {
     if (!confirm(`选项"${trimmed}"已存在，确定要添加重复项吗？`)) return;
   }
   state.options.push(trimmed);
-  showToast('已添加: ' + trimmed, 600);
   syncUI();
   dom.optionInput.value = '';
   dom.optionInput.focus();
