@@ -1117,10 +1117,10 @@ function addOption(text) {
     if (!confirm(`选项"${trimmed}"已存在，确定要添加重复项吗？`)) return;
   }
   state.options.push(trimmed);
-  // 先清输入框再刷新界面——保证即使渲染出错输入框也已清空
+  syncUI();
   dom.optionInput.value = '';
-  dom.optionInput.focus();
-  try { syncUI(); } catch (e) { console.warn('syncUI failed', e); }
+  // 延迟聚焦避免移动端键盘弹出打断DOM渲染
+  setTimeout(() => dom.optionInput.focus(), 50);
 }
 
 function removeOption(index) {
