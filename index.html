@@ -794,7 +794,7 @@ function shuffleAndReveal() {
           btn.disabled = true;
           btn.textContent = '已揭晓';
 
-          revealCard(wrapper, chosenIndex, cardResult);
+          revealCard(wrapper, chosenIndex, cardResult, allWrappers);
         });
         return;
       }
@@ -805,7 +805,7 @@ function shuffleAndReveal() {
   }, totalFlipTime);
 }
 
-function revealCard(wrapper, chosenIndex, winIndex) {
+function revealCard(wrapper, chosenIndex, winIndex, allWrappers) {
   const inner = wrapper.querySelector('.card-inner');
 
   // ── 阶段1：绿色标记点击牌 0.4s ──
@@ -824,11 +824,13 @@ function revealCard(wrapper, chosenIndex, winIndex) {
 
     // ── 阶段3：0.45s后全部牌翻转 + 紫色标记中选牌 ──
     setTimeout(() => {
-      document.querySelectorAll('.card-inner').forEach(c => {
-        c.style.transform = 'rotateY(0deg)';
+      // 遍历预捕获的NodeList查找中选牌，避免移动端querySelector属性选择器不稳定
+      const wrappersArr = Array.from(allWrappers);
+      wrappersArr.forEach(w => {
+        w.querySelector('.card-inner').style.transform = 'rotateY(0deg)';
       });
 
-      const winWrapper = document.querySelector(`.card-wrapper[data-index="${winIndex}"]`);
+      const winWrapper = wrappersArr.find(w => parseInt(w.dataset.index) === winIndex);
       if (winWrapper) {
         winWrapper.style.outline = '3px solid #b98eff';
         winWrapper.style.outlineOffset = '3px';
@@ -838,7 +840,6 @@ function revealCard(wrapper, chosenIndex, winIndex) {
         winInner.style.boxShadow = '0 0 28px rgba(185,142,255,0.7)';
         winInner.style.zIndex = '5';
         showToast(`🟣 中选: [${winIndex}] ${state.options[winIndex]}`, 1800);
-        // 清除紫色框
         setTimeout(() => {
           winWrapper.style.outline = '';
           winWrapper.style.outlineOffset = '';
