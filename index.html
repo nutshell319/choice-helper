@@ -373,7 +373,7 @@ function renderWheel() {
   }
 
   dom.stage.innerHTML = `
-    <canvas id="wheelCanvas" width="320" height="320"></canvas>
+    <canvas id="wheelCanvas" style="width:320px;height:320px;"></canvas>
     <div style="margin-top:16px;">
       <button class="btn-action" id="btnSpin" ${state.isAnimating ? 'disabled' : ''}>
         ${state.isAnimating ? '旋转中…' : '🎯 开始'}
@@ -388,6 +388,12 @@ function renderWheel() {
 
   wheelCanvas = document.getElementById('wheelCanvas');
   wheelCtx = wheelCanvas.getContext('2d');
+  // 适配高DPI屏幕：canvas物理像素 = 逻辑尺寸 × devicePixelRatio
+  const dpr = window.devicePixelRatio || 1;
+  const size = 320;
+  wheelCanvas.width = size * dpr;
+  wheelCanvas.height = size * dpr;
+  wheelCtx.scale(dpr, dpr);
   drawWheel();
 
   document.getElementById('btnSpin').addEventListener('click', spinWheel);
