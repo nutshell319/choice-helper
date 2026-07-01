@@ -1112,17 +1112,15 @@ function addOption(text) {
   if (state.isAnimating) { showToast('动画进行中，请稍候'); return; }
   const trimmed = text.trim();
   if (!trimmed) { showToast('选项不能为空'); return; }
-  if (trimmed.length > 50) {
-    showToast('选项最多 50 个字符');
-    return;
-  }
+  if (trimmed.length > 50) { showToast('选项最多 50 个字符'); return; }
   if (state.options.includes(trimmed)) {
     if (!confirm(`选项"${trimmed}"已存在，确定要添加重复项吗？`)) return;
   }
   state.options.push(trimmed);
-  syncUI();
+  // 先清输入框再刷新界面——保证即使渲染出错输入框也已清空
   dom.optionInput.value = '';
   dom.optionInput.focus();
+  try { syncUI(); } catch (e) { console.warn('syncUI failed', e); }
 }
 
 function removeOption(index) {
