@@ -707,7 +707,6 @@ function shuffleAndReveal() {
 
   const cards = document.querySelectorAll('.card-inner');
   const wrappers = document.querySelectorAll('.card-wrapper');
-  const cardResult = Math.floor(Math.random() * state.options.length);
 
   // Step 1: 逐张翻面到背面
   cards.forEach((card, i) => {
@@ -794,7 +793,7 @@ function shuffleAndReveal() {
           btn.disabled = true;
           btn.textContent = '已揭晓';
 
-          revealCard(wrapper, chosenIndex, cardResult, allWrappers);
+          revealCard(wrapper, chosenIndex, allWrappers);
         });
         return;
       }
@@ -805,53 +804,37 @@ function shuffleAndReveal() {
   }, totalFlipTime);
 }
 
-function revealCard(wrapper, chosenIndex, winIndex, allWrappers) {
+function revealCard(wrapper, chosenIndex, allWrappers) {
   const inner = wrapper.querySelector('.card-inner');
 
   // ── 阶段1：绿色标记点击牌 0.4s ──
   wrapper.style.outline = '3px solid #69db7c';
   wrapper.style.outlineOffset = '3px';
   wrapper.style.zIndex = '50';
-  showToast(`🟢 你点击了: [${chosenIndex}] ${state.options[chosenIndex]}`, 1500);
+  showToast(`🟢 你选择了: ${state.options[chosenIndex]}`, 1500);
 
   setTimeout(() => {
-    // ── 阶段2：点击牌单独翻转 ──
+    // ── 阶段2：点击牌翻转 ──
     wrapper.style.outline = '';
     wrapper.style.outlineOffset = '';
     wrapper.style.zIndex = '';
     inner.style.transform = 'rotateY(0deg)';
-    showToast(`🔄 正在翻开你点击的牌…`, 1000);
+    showToast(`🔄 揭晓中…`, 800);
 
-    // ── 阶段3：0.45s后全部牌翻转 + 紫色标记中选牌 ──
+    // ── 阶段3：全部翻开，点击牌高亮 ──
     setTimeout(() => {
-      // 遍历预捕获的NodeList查找中选牌，避免移动端querySelector属性选择器不稳定
       const wrappersArr = Array.from(allWrappers);
       wrappersArr.forEach(w => {
         w.querySelector('.card-inner').style.transform = 'rotateY(0deg)';
       });
 
-      const winWrapper = wrappersArr.find(w => parseInt(w.dataset.index) === winIndex);
-      if (winWrapper) {
-        winWrapper.style.outline = '3px solid #b98eff';
-        winWrapper.style.outlineOffset = '3px';
-        winWrapper.style.zIndex = '50';
-        const winInner = winWrapper.querySelector('.card-inner');
-        winInner.style.transform = 'rotateY(0deg) scale(1.08)';
-        winInner.style.boxShadow = '0 0 28px rgba(185,142,255,0.7)';
-        winInner.style.zIndex = '5';
-        showToast(`🟣 中选: [${winIndex}] ${state.options[winIndex]}`, 1800);
-        setTimeout(() => {
-          winWrapper.style.outline = '';
-          winWrapper.style.outlineOffset = '';
-          winWrapper.style.zIndex = '';
-        }, 1000);
-      }
+      // 点击牌即中选牌，放大+发光
+      inner.style.transform = 'rotateY(0deg) scale(1.08)';
+      inner.style.boxShadow = '0 0 28px rgba(185,142,255,0.7)';
+      inner.style.zIndex = '5';
+      showToast(`🎉 结果: ${state.options[chosenIndex]}`, 2000);
 
-      if (chosenIndex !== winIndex) {
-        inner.style.boxShadow = '0 0 8px rgba(232,93,117,0.4)';
-      }
-
-      setTimeout(() => showCardResult(winIndex), 800);
+      setTimeout(() => showCardResult(chosenIndex), 800);
     }, 450);
   }, 400);
 }
