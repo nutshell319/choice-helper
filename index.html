@@ -624,6 +624,7 @@ function renderCard() {
       display:grid;grid-template-columns:repeat(${cols},1fr);
       gap:${gap};justify-content:center;padding:${padding};
       max-width:${maxGridW}px;width:100%;margin:0 auto;
+      touch-action:manipulation;
     ">
       ${state.options.map((opt, i) => `
         <div class="card-wrapper" data-index="${i}" style="width:100%;">
@@ -751,23 +752,28 @@ function shuffleAndReveal() {
 
     function runPass(p) {
       if (p >= passes) {
-        // 洗牌完成
+        // 洗牌完成——使用事件委托：在grid层统一监听，用closest动态定位点击的卡片
         btn.textContent = '点击任意一张翻牌…';
         btn.disabled = false;
 
-        const finalWrappers = document.querySelectorAll('.card-wrapper');
-        finalWrappers.forEach((w) => {
-          w.style.cursor = 'pointer';
-          w.addEventListener('click', function reveal(e) {
-            const idx = parseInt(w.dataset.index);
-            revealCard(w, idx, cardResult);
-            finalWrappers.forEach(ww => {
-              ww.style.cursor = 'default';
-              ww.replaceWith(ww.cloneNode(true));
-            });
-            btn.disabled = true;
-            btn.textContent = '已揭晓';
-          });
+        const finalGrid = document.getElementById('cardGrid');
+        const allWrappers = finalGrid.querySelectorAll('.card-wrapper');
+        allWrappers.forEach(w => { w.style.cursor = 'pointer'; });
+
+        let revealed = false;
+        finalGrid.addEventListener('click', function revealHandler(e) {
+          if (revealed) return;
+          // 动态查找点击目标——避免移动端3D变换干扰事件路由
+          const wrapper = e.target.closest('.card-wrapper');
+          if (!wrapper) return;
+          revealed = true;
+
+          const chosenIndex = parseInt(wrapper.dataset.index);
+          allWrappers.forEach(w => { w.style.cursor = 'default'; });
+          btn.disabled = true;
+          btn.textContent = '已揭晓';
+
+          revealCard(wrapper, chosenIndex, cardResult);
         });
         return;
       }
@@ -779,16 +785,17 @@ function shuffleAndReveal() {
 }
 
 function revealCard(wrapper, chosenIndex, winIndex) {
+  // 先翻转用户点击的那张牌
   const inner = wrapper.querySelector('.card-inner');
   inner.style.transform = 'rotateY(0deg)';
 
-  // Flip all other cards to front too after a brief delay
+  // 短暂延迟后翻转全部牌面 + 高亮中选牌
   setTimeout(() => {
     document.querySelectorAll('.card-inner').forEach(c => {
       c.style.transform = 'rotateY(0deg)';
     });
 
-    // Highlight winner
+    // 高亮中选牌
     const winWrapper = document.querySelector(`.card-wrapper[data-index="${winIndex}"]`);
     if (winWrapper) {
       const winInner = winWrapper.querySelector('.card-inner');
@@ -796,8 +803,8 @@ function revealCard(wrapper, chosenIndex, winIndex) {
       winInner.style.boxShadow = '0 0 28px rgba(185,142,255,0.7)';
       winInner.style.zIndex = '5';
     }
-    // Dim non-winners if user picked wrong
-    if (chosenIndex !== winIndex && wrapper) {
+    // 若用户点击的牌非中选牌，给点击牌加红晕提示
+    if (chosenIndex !== winIndex) {
       inner.style.boxShadow = '0 0 8px rgba(232,93,117,0.4)';
     }
 
