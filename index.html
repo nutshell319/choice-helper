@@ -1096,9 +1096,9 @@ function escapeHtml(str) {
 }
 
 function syncUI() {
-  saveCurrent();
-  renderTags();
-  renderStage();
+  try { saveCurrent(); } catch(e) { showToast('saveCurrent: '+e.message, 3000); }
+  try { renderTags(); } catch(e) { showToast('renderTags: '+e.message, 3000); }
+  try { renderStage(); } catch(e) { showToast('renderStage: '+e.message, 3000); }
 }
 
 function addOption(text) {
@@ -1113,6 +1113,7 @@ function addOption(text) {
     if (!confirm(`选项"${trimmed}"已存在，确定要添加重复项吗？`)) return;
   }
   state.options.push(trimmed);
+  showToast('已添加: ' + trimmed, 600);
   syncUI();
   dom.optionInput.value = '';
   dom.optionInput.focus();
