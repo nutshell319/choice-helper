@@ -263,7 +263,6 @@ body {
       <button class="btn-refresh" id="btnRefresh" title="清除缓存并强制刷新到最新版本">🔄</button>
       <button class="btn-manage" id="btnManage">⚙ 管理列表</button>
   </div>
-  </div>
 
   <!-- Tabs -->
   <div class="tabs" id="tabs">
@@ -1106,15 +1105,15 @@ function addOption(text) {
   if (state.isAnimating) { showToast('动画进行中，请稍候'); return; }
   const trimmed = text.trim();
   if (!trimmed) { showToast('选项不能为空'); return; }
-  if (trimmed.length > 50) { showToast('选项最多 50 个字符'); return; }
+  if (trimmed.length > 50) {
+    showToast('选项最多 50 个字符');
+    return;
+  }
   if (state.options.includes(trimmed)) {
     if (!confirm(`选项"${trimmed}"已存在，确定要添加重复项吗？`)) return;
   }
   state.options.push(trimmed);
-  // 拆开 syncUI 每一步，确保即时渲染
-  try { localStorage.setItem('choice-helper-current', JSON.stringify(state.options)); } catch (e) {}
-  renderTags();
-  renderStage();
+  syncUI();
   dom.optionInput.value = '';
   dom.optionInput.focus();
 }
@@ -1123,9 +1122,7 @@ function removeOption(index) {
   if (state.isAnimating) { showToast('动画进行中，请稍候'); return; }
   if (index < 0 || index >= state.options.length) return;
   state.options.splice(index, 1);
-  try { localStorage.setItem('choice-helper-current', JSON.stringify(state.options)); } catch (e) {}
-  renderTags();
-  renderStage();
+  syncUI();
 }
 
 // ===== Event: 添加选项 =====
@@ -1151,9 +1148,7 @@ dom.btnClearOptions.addEventListener('click', () => {
   if (state.options.length === 0) return;
   if (!confirm(`确定清空全部 ${state.options.length} 个选项吗？`)) return;
   state.options = [];
-  try { localStorage.setItem('choice-helper-current', JSON.stringify(state.options)); } catch (e) {}
-  renderTags();
-  renderStage();
+  syncUI();
 });
 
 // ===== Toast =====
@@ -1302,9 +1297,7 @@ function loadPreset(name) {
   const list = presets[name];
   if (!list) { showToast('预设不存在'); return; }
   state.options = [...list];
-  try { localStorage.setItem('choice-helper-current', JSON.stringify(state.options)); } catch (e) {}
-  renderTags();
-  renderStage();
+  syncUI();
   closeModal();
   showToast(`已加载预设"${name}"（${list.length} 项）`);
 }
