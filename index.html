@@ -66,11 +66,6 @@ body {
 	}
 	.btn-refresh:hover { background: var(--surface-hover); color: var(--text); }
 	.btn-refresh:active { transform: scale(0.95); }
-	.version-label {
-	  font-size: 10px; color: var(--text-dim); font-family: monospace;
-	  max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-	}
-
 /* ===== Tabs ===== */
 .tabs {
   display: flex; gap: 4px;
@@ -265,7 +260,6 @@ body {
     <h1>🎲 两碗饭-选择助手 v3</h1>
     <div class="header-actions">
       <button class="btn-refresh" id="btnRefresh" title="清除缓存并强制刷新到最新版本">🔄</button>
-      <span id="versionLabel" class="version-label" title="当前版本哈希"></span>
       <button class="btn-manage" id="btnManage">⚙ 管理列表</button>
     </div>
   </div>
@@ -327,7 +321,6 @@ const dom = {
   tags: $('#tags'),
   btnManage: $('#btnManage'),
   btnRefresh: $('#btnRefresh'),
-  versionLabel: $('#versionLabel'),
   btnLoadPreset: $('#btnLoadPreset'),
   btnClearOptions: $('#btnClearOptions'),
   modalOverlay: $('#modalOverlay'),
@@ -1383,10 +1376,6 @@ try {
   if (loadedVer && loadedVer !== APP_VERSION) {
     // 刚从缓存中加载了旧版本但带时间戳参数，说明需要刷新
     // 这种情况通常由 btnRefresh 触发，无需额外处理
-  }
-  // 每次加载显示当前版本哈希
-  if (dom.versionLabel) {
-    dom.versionLabel.textContent = APP_VERSION.slice(0, 7);
   }
 } catch (e) { /* ignore */ }
 
